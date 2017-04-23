@@ -13,6 +13,15 @@ defmodule Revisionair do
   ## Accepted options
 
   For now, only `:persistence` is an accepted option. It allows overriding the `config :revisionair, persistence` setting per function call.
+
+  ## Metadata
+
+  You might want to store metadata alongside with the revision you are storing.
+  Some common examples include:
+
+  - An identifier of the entity that made the revision.
+  - The current datetime at which the revision occured.
+  - The kind of revision that was being done.
   """
 
   @doc """
@@ -85,7 +94,7 @@ defmodule Revisionair do
   end
 
   @doc """
-
+  Deletes all stored revisions of the given structure.
   """
   def delete_all_revisions_of(structure), do: delete_all_revisions_of(structure, [])
   def delete_all_revisions_of(structure, options) when is_list(options) do
