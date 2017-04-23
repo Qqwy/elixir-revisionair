@@ -33,6 +33,7 @@ defmodule Revisionair do
 
   def store_revision(structure), do: store_revision(structure, %{}, [])
   def store_revision(structure, metadata) when is_map(metadata), do: store_revision(structure, metadata, [])
+  def store_revision(structure, options) when is_list(options), do: store_revision(structure, %{}, options)
   def store_revision(structure, metadata, options) when is_map(metadata) and is_list(options) do
     store_revision(structure, &(&1.__struct__), &(&1.id), metadata, options)
   end
@@ -52,6 +53,9 @@ defmodule Revisionair do
   def store_revision(structure, structure_type, unique_identifier), do: store_revision(structure, structure_type, unique_identifier, %{}, [])
   def store_revision(structure, structure_type, unique_identifier, metadata) when is_map(metadata) do
     store_revision(structure, structure_type, unique_identifier, metadata, [])
+  end
+  def store_revision(structure, structure_type, unique_identifier, options) when is_list(options) do
+    store_revision(structure, structure_type, unique_identifier, %{}, options)
   end
   def store_revision(structure, structure_type, unique_identifier, metadata, options) when is_map(structure) and is_map(metadata) and is_list(options) do
     persistence_module = persistence_module(options)
@@ -90,7 +94,7 @@ defmodule Revisionair do
     structure_type = extract_structure_type(structure, structure_type)
     unique_identifier = extract_unique_identifier(structure, unique_identifier)
 
-    list_revisions(structure_type, unique_identifier)
+    list_revisions(structure_type, unique_identifier, options)
   end
 
   @doc """
@@ -110,11 +114,11 @@ defmodule Revisionair do
   def delete_all_revisions_of(structure, structure_type, unique_identifier) do
     delete_all_revisions_of(structure, structure_type, unique_identifier, [])
   end
-  def delete_all_revisions_of(structure, structure_type, unique_identifier, options \\ []) when is_function(structure_type) or is_function(unique_identifier) and is_list(options) do
+  def delete_all_revisions_of(structure, structure_type, unique_identifier, options) when is_list(options) do
     structure_type = extract_structure_type(structure, structure_type)
     unique_identifier = extract_unique_identifier(structure, unique_identifier)
 
-    delete_all_revisions_of(structure, structure_type, unique_identifier)
+    delete_all_revisions_of(structure_type, unique_identifier, options)
   end
 
   defp persistence_module(options) do
