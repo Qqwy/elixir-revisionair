@@ -9,6 +9,8 @@ defmodule Revisionair.Mixfile do
      start_permanent: Mix.env == :prod,
      deps: deps(),
      name: "Revisionair",
+     description: description(),
+     package: package()
     ]
   end
 
@@ -30,9 +32,10 @@ defmodule Revisionair.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:ex_doc, ">= 0.0.0", only: :dev}
+    ]
   end
-
 
   defp description do
     """
@@ -44,9 +47,9 @@ defmodule Revisionair.Mixfile do
     # These are the default files included in the package
     [
       name: :revisionair,
-      files: ["lib", "priv", "mix.exs", "README*"],
-      maintainers: ["Qqwy/W-M"],
-      licenses: ["Apache 2.0"],
+      files: ["lib", "mix.exs", "README*"],
+      maintainers: ["Wiebe-Marten Wijnja/Qqwy"],
+      licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/Qqwy/elixir_revisionair"}
     ]
   end
