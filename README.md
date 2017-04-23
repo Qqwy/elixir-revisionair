@@ -1,5 +1,7 @@
 # Revisionair
 
+[![Hex.pm](https://img.shields.io/hexpm/v/revisionair.svg)](https://hex.pm/packages/revisionair)
+
 Revisionair is a small Elixir library that allows you to create revisions, or versioning, of your data structures.
 Each time a data structure is updated, you can store the new version. Revisionair will keep track of the versions you have stored.
 
