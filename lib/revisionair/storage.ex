@@ -10,6 +10,8 @@ defmodule Revisionair.Storage do
   Because Revisionair.Storage is a behaviour, you are not limited in any way
   by the kind of persistence layer you want to use.
 
+  Note that, while written out in this behaviour, some Storage implementations might put
+  restrictions on the kind of values `structure_type` and/or `unique_identifier` might have.
   """
 
   @type metadata :: %{}
@@ -28,7 +30,17 @@ defmodule Revisionair.Storage do
   @callback list_revisions(structure_type, unique_identifier) :: [{structure, metadata}]
 
   @doc """
+  Returns the newest revision for the given {structure_type, unique_identifier} combination.
+
+  This callback is supplied decoupled from `list_revisions` for efficiency,
+  because it is very common to check only the newest revision.
+  """
+  @callback newest_revision(structure_type, unique_identifier) :: {:ok, {structure, metadata}} | :error
+
+  @doc """
   Deletes all revisions for the given {structure_type, unique_identifier}
   """
   @callback delete_all_revisions_of(structure_type, unique_identifier) :: :ok | :error
+
+  @optional_callbacks newest_revision: 2
 end

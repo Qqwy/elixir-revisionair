@@ -3,11 +3,13 @@ defmodule Revisionair.Mixfile do
 
   def project do
     [app: :revisionair,
-     version: "0.1.0",
+     version: "0.9.0",
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps()]
+     deps: deps(),
+     name: "Revisionair",
+    ]
   end
 
   # Configuration for the OTP application

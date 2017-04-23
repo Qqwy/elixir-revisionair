@@ -85,7 +85,7 @@ defmodule Revisionair do
 
   @doc """
   A four-arity version that allows you to specify functions to call on the given structure to extract the structure_type and unique_identifier.
-  Might be useful in pipelines.
+  Used internally; part of the public API as it might be useful in pipelines.
   """
   def list_revisions(structure, structure_type, unique_identifier) do
     list_revisions(structure, structure_type, unique_identifier, [])
@@ -95,6 +95,40 @@ defmodule Revisionair do
     unique_identifier = extract_unique_identifier(structure, unique_identifier)
 
     list_revisions(structure_type, unique_identifier, options)
+  end
+
+
+
+  @doc """
+  Returns the newest stored revision for the given structure,
+  assuming that the structure type can be found under the structures `__struct__` key and it is uniquely identified by the `id` key.
+  """
+  def newest_revision(structure), do: newest_revision(structure, [])
+  def newest_revision(structure, options) when is_list(options) do
+    newest_revision(structure, &(&1.__struct__), &(&1.id), options)
+  end
+
+  @doc """
+  Returns the newest stored revision of the structure of given type and identifier.
+  """
+  def newest_revision(structure_type, unique_identifier), do: newest_revision(structure_type, unique_identifier, [])
+  def newest_revision(structure_type, unique_identifier, options) when is_list(options) do
+    persistence_module = persistence_module(options)
+    persistence_module.newest_revision(structure_type, unique_identifier)
+  end
+
+  @doc """
+  A four-arity version that allows you to specify functions to call on the given structure to extract the structure_type and unique_identifier.
+  Used internally; part of the public API as it might be useful in pipelines.
+  """
+  def newest_revision(structure, structure_type, unique_identifier) do
+    newest_revision(structure, structure_type, unique_identifier, [])
+  end
+  def newest_revision(structure, structure_type, unique_identifier, options) when is_function(structure_type) or is_function(unique_identifier) do
+    structure_type = extract_structure_type(structure, structure_type)
+    unique_identifier = extract_unique_identifier(structure, unique_identifier)
+
+    newest_revision(structure_type, unique_identifier, options)
   end
 
   @doc """
@@ -121,6 +155,7 @@ defmodule Revisionair do
     delete_all_revisions_of(structure_type, unique_identifier, options)
   end
 
+  # Either read from the options, or otherwise from the application configuration.
   defp persistence_module(options) do
     options[:persistence] || Application.fetch_env!(:revisionair, :persistence)
   end
