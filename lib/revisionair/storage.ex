@@ -9,17 +9,23 @@ defmodule Revisionair.Storage do
 
   Because Revisionair.Storage is a behaviour, you are not limited in any way
   by the kind of persistence layer you want to use.
+
   """
+
+  @type metadata :: %{}
+  @type structure :: %{}
+  @type structure_type :: integer | bitstring | atom
+  @type unique_identifier :: integer | bitstring | atom
 
   @doc """
   Stores a new revision for the given map, uniquely identified by the {structure_type, unique_identifier} combination.
   """
-  @callback store_revision(structure = %{}, structure_type = any, unique_identifier = any, metadata = %{}) :: :ok | :error
+  @callback store_revision(structure, structure_type, unique_identifier, metadata) :: :ok | :error
 
   @doc """
   Returns a {structure, metadata}-list of all revisions of the given struture, newest-to-oldest.
   """
-  @callback list_revisions(structure_type, unique_identifier) :: [{structure = %{}, metadata = any}]
+  @callback list_revisions(structure_type, unique_identifier) :: [{structure, metadata}]
 
   @doc """
   Deletes all revisions for the given {structure_type, unique_identifier}
