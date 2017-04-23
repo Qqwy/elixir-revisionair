@@ -28,39 +28,38 @@ defmodule Revisionair do
   Shorthand version of `store_revision/5` that assumes
   that the structure's type will be read from the `__struct__` field (the Struct's name)
   and the structure can be uniquely identified using the `id` field.
-  """
-  # def store_revision(structure, metadata \\ %{}, options \\ [])
 
+      iex> Revisionair.Storage.Agent.start_link
+      iex> Revisionair.store_revision(%{id: 1, foo: 2, __struct__: Car}, [persistence: Revisionair.Storage.Agent])
+      :ok
+      iex> my_car = %{wheels: 4, color: "black"}
+      iex> Revisionair.store_revision(my_car, Vehicle, 1, [metadata: %{editor_id: 1}, persistence: Revisionair.Storage.Agent])
+      :ok
+  """
   def store_revision(structure), do: store_revision(structure, %{}, [])
-  def store_revision(structure, metadata) when is_map(metadata), do: store_revision(structure, metadata, [])
-  def store_revision(structure, options) when is_list(options), do: store_revision(structure, %{}, options)
-  def store_revision(structure, metadata, options) when is_map(metadata) and is_list(options) do
-    store_revision(structure, &(&1.__struct__), &(&1.id), metadata, options)
+  # def store_revision(structure, metadata) when is_map(metadata), do: store_revision(structure, metadata, [])
+  def store_revision(structure, options) when is_list(options) do
+    store_revision(structure, &(&1.__struct__), &(&1.id), options)
   end
 
   @doc """
   Store a revision of the given structure,
   of the 'type' `structure_type`,
-  uniquely identified by `unique_identifier`, with the given `metadata` and possible `options`
+  uniquely identified by `unique_identifier`, and possibly with the given `options`
   in the persistence layer.
 
   If `structure_type` or `unique_identifier` is an arity-1 function,
   then to find the structure_type or unique_identifier, they are called on the given structure.
   As an example, the default function that extracts the unique identifier from the `:id` field of the structure, is `&(&1.id)`.
+
+  `options` might contain the `metadata:` field, in which case the given metadata is saved alongside the stored structure.
   """
-  @spec store_revision(%{}, any, any, %{}, Keyword.t) :: :ok | :error
-  # def store_revision(structure, structure_type, unique_identifier, metadata \\ [], options \\ [])
-  def store_revision(structure, structure_type, unique_identifier), do: store_revision(structure, structure_type, unique_identifier, %{}, [])
-  def store_revision(structure, structure_type, unique_identifier, metadata) when is_map(metadata) do
-    store_revision(structure, structure_type, unique_identifier, metadata, [])
-  end
-  def store_revision(structure, structure_type, unique_identifier, options) when is_list(options) do
-    store_revision(structure, structure_type, unique_identifier, %{}, options)
-  end
-  def store_revision(structure, structure_type, unique_identifier, metadata, options) when is_map(structure) and is_map(metadata) and is_list(options) do
+  def store_revision(structure, structure_type, unique_identifier), do: store_revision(structure, structure_type, unique_identifier, [])
+  def store_revision(structure, structure_type, unique_identifier, options) when is_map(structure) and is_list(options) do
     persistence_module = persistence_module(options)
     structure_type = extract_structure_type(structure, structure_type)
     unique_identifier = extract_unique_identifier(structure, unique_identifier)
+    metadata = Keyword.get(options, :metadata, %{})
 
     persistence_module.store_revision(structure, structure_type, unique_identifier, metadata)
   end
@@ -68,6 +67,16 @@ defmodule Revisionair do
   @doc """
   Lists revisions for given structure,
   assuming that the structure type can be found under the structures `__struct__` key and it is uniquely identified by the `id` key.
+
+
+      iex> Revisionair.Storage.Agent.start_link
+      iex> my_car = %{wheels: 4, color: "black"}
+      iex> Revisionair.store_revision(my_car, Vehicle, 1, [metadata: %{editor_id: 1}, persistence: Revisionair.Storage.Agent])
+      iex> my_car = %{my_car | color: "green"}
+      iex> Revisionair.store_revision(my_car, Vehicle, 1, [metadata: %{editor_id: 1}, persistence: Revisionair.Storage.Agent])
+      iex> Revisionair.list_revisions(Vehicle, 1, [persistence: Revisionair.Storage.Agent])
+      [{%{color: "green", wheels: 4}, %{editor_id: 1}},
+      {%{color: "black", wheels: 4}, %{editor_id: 1}}]
   """
   def list_revisions(structure), do: list_revisions(structure, [])
   def list_revisions(structure, options) when is_list(options) do
