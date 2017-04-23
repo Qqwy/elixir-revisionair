@@ -32,4 +32,22 @@ defmodule Revisionair.Mixfile do
   defp deps do
     []
   end
+
+
+  defp description do
+    """
+    Keep track of revisions, versions, changes to your data. Persistence layer agnostic.
+    """
+  end
+
+  defp package do
+    # These are the default files included in the package
+    [
+      name: :revisionair,
+      files: ["lib", "priv", "mix.exs", "README*"],
+      maintainers: ["Qqwy/W-M"],
+      licenses: ["Apache 2.0"],
+      links: %{"GitHub" => "https://github.com/Qqwy/elixir_revisionair"}
+    ]
+  end
 end
