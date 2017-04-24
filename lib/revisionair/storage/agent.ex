@@ -41,8 +41,10 @@ defmodule Revisionair.Storage.Agent do
         case num_revisions do
           0 -> :error
           _ ->
-            revision = revisions[num_revisions - 1]
-            revision = put_in revision.metadata, :revision, num_revisions - 1
+            # revision = revisions[num_revisions - 1]
+            # revision = put_in revision.metadata, :revision, num_revisions - 1
+
+            revision = put_revision_in_metadata(revisions[num_revisions - 1], num_revisions - 1)
           {:ok, revision}
         end
       _ -> :error
@@ -50,9 +52,10 @@ defmodule Revisionair.Storage.Agent do
   end
 
   def get_revision(structure_type, unique_identifier, revision) do
+    IO.inspect({structure_type, unique_identifier, revision})
     Agent.get(__MODULE__, fn
-      %{^structure_type => %{^unique_identifier => %{revisions: %{^revision => revision}}}} ->
-        {:ok, revision}
+      %{^structure_type => %{^unique_identifier => %{revisions: %{^revision => data}}}} ->
+        {:ok, put_revision_in_metadata(data, revision)}
       _ -> :error
     end)
   end
@@ -62,5 +65,9 @@ defmodule Revisionair.Storage.Agent do
     Agent.update(__MODULE__, fn structure_types ->
       pop_in structure_types, [structure_type, unique_identifier]
     end)
+  end
+
+  defp put_revision_in_metadata({data, metadata}, revision) do
+    {data, Map.put(metadata, :revision, revision)}
   end
 end

@@ -40,7 +40,10 @@ defmodule RevisionairTest do
     Revisionair.store_revision(f1, [persistence: Revisionair.Storage.Agent])
     Revisionair.store_revision(f1b, [persistence: Revisionair.Storage.Agent])
 
-    assert Revisionair.get_revision(f1b, 1, [persistence: Revisionair.Storage.Agent]) == f1b
-    assert Revisionair.get_revision(f1b, 0, [persistence: Revisionair.Storage.Agent]) == f1
+    assert Revisionair.get_revision(f1b, 1, [persistence: Revisionair.Storage.Agent]) == \
+    {:ok, {%RevisionairTest.TestStruct{bar: 3, foo: 2, id: 1}, %{revision: 1}}}
+    assert Revisionair.get_revision(f1b, 0, [persistence: Revisionair.Storage.Agent]) == \
+    {:ok, {%RevisionairTest.TestStruct{bar: 2, foo: 0, id: 1}, %{revision: 0}}}
+
   end
 end

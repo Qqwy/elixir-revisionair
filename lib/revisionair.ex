@@ -75,8 +75,8 @@ defmodule Revisionair do
       iex> my_car = %{my_car | color: "green"}
       iex> Revisionair.store_revision(my_car, Vehicle, 1, [metadata: %{editor_id: 1}, persistence: Revisionair.Storage.Agent])
       iex> Revisionair.list_revisions(Vehicle, 1, [persistence: Revisionair.Storage.Agent])
-      [{%{color: "green", wheels: 4}, %{editor_id: 1}},
-      {%{color: "black", wheels: 4}, %{editor_id: 1}}]
+      [{%{color: "green", wheels: 4}, %{editor_id: 1, revision: 1}},
+      {%{color: "black", wheels: 4}, %{editor_id: 1, revision: 0}}]
   """
   def list_revisions(structure), do: list_revisions(structure, [])
   def list_revisions(structure, options) when is_list(options) do
@@ -142,9 +142,11 @@ defmodule Revisionair do
   Returns the stored revision for the given structure, with the given `revision`.
   assuming that the structure type can be found under the structures `__struct__` key and it is uniquely identified by the `id` key.
   """
-  def get_revision(structure, revision), do: get_revision(structure, revision, [])
+  def get_revision(structure, revision) do
+    get_revision(structure, revision, [])
+  end
   def get_revision(structure, revision, options) when is_list(options) do
-    get_revision(structure, revision, &(&1.__struct__), &(&1.id), options)
+    get_revision(structure, &(&1.__struct__), &(&1.id), revision, options)
   end
 
   @doc """
@@ -159,7 +161,7 @@ defmodule Revisionair do
   def get_revision(structure, structure_type, unique_identifier, revision) do
     get_revision(structure, structure_type, unique_identifier, revision, [])
   end
-  def get_revision(structure, structure_type, unique_identifier, revision, options) when is_function(structure_type) or is_function(unique_identifier) do
+  def get_revision(structure, structure_type, unique_identifier, revision, options) when is_list(options) do
     structure_type = extract_structure_type(structure, structure_type)
     unique_identifier = extract_unique_identifier(structure, unique_identifier)
 
