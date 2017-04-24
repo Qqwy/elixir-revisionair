@@ -51,17 +51,17 @@ which might both be useful if you do not use an `:id` field, or if you have stru
 The persistence layer that Revisionair uses is fully configurable.
 
 Which Revisionair.Storage implementation you use can be configured app-wide using the
-`config :revisionair, persistence: Module.That.Implements.Revisionair.Storage` configuration setting.
+`config :revisionair, storage: Module.That.Implements.Revisionair.Storage` configuration setting.
 
 When you want to override this setting, or have more complicated persistence needs (multiple different kinds of persistence in the same application?),
-you can pass `persistence: Module.That.Implements.Revisionair.Storage` as option to all functions in the `Revolutionair` module:
+you can pass `storage: Module.That.Implements.Revisionair.Storage` as option to all functions in the `Revolutionair` module:
 
 ```elixir
-Revisionair.store_revision(my_structure, [persistence: Revisionair.Storage.Agent])
+Revisionair.store_revision(my_structure, [storage: Revisionair.Storage.Agent])
 # or:
-Revisionair.store_revision(my_car, Vehicle, my_car.id, [persistence: Revisionair.Storage.Agent])
+Revisionair.store_revision(my_car, Vehicle, my_car.id, [storage: Revisionair.Storage.Agent])
 # or:
-Revisionair.store_revision(my_car, Vehicle, my_car.id, %{editor: current_user}, [persistence: Revisionair.Storage.Agent])
+Revisionair.store_revision(my_car, Vehicle, my_car.id, %{editor: current_user}, [storage: Revisionair.Storage.Agent])
 ```
 
 Revisionair ships with a very simple `Agent` layer that is used for testing.

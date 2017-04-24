@@ -3,16 +3,16 @@ defmodule Revisionair do
 
   Revisionair allows you to store revisions of your data structures.
 
-  ## Persistence
+  ## Storage
 
-  Any persistence layer can be used, as long as there exists a module implementing the Revisionair.Storage behaviour.
+  Any storage layer can be used, as long as there exists a module implementing the Revisionair.Storage behaviour.
 
-  Many of the functions in this module accept a `persistence: modulename` field as optional `options` argument,
-  but if this is not provided, the value of `config :revisionair, :persistence` is used instead.
+  Many of the functions in this module accept a `storage: modulename` field as optional `options` argument,
+  but if this is not provided, the value of `config :revisionair, :storage` is used instead.
 
   ## Accepted options
 
-  For now, only `:persistence` is an accepted option. It allows overriding the `config :revisionair, persistence` setting per function call.
+  For now, only `:storage` is an accepted option. It allows overriding the `config :revisionair, storage` setting per function call.
 
   ## Metadata
 
@@ -30,10 +30,10 @@ defmodule Revisionair do
   and the structure can be uniquely identified using the `id` field.
 
       iex> Revisionair.Storage.Agent.start_link
-      iex> Revisionair.store_revision(%{id: 1, foo: 2, __struct__: Car}, [persistence: Revisionair.Storage.Agent])
+      iex> Revisionair.store_revision(%{id: 1, foo: 2, __struct__: Car}, [storage: Revisionair.Storage.Agent])
       :ok
       iex> my_car = %{wheels: 4, color: "black"}
-      iex> Revisionair.store_revision(my_car, Vehicle, 1, [metadata: %{editor_id: 1}, persistence: Revisionair.Storage.Agent])
+      iex> Revisionair.store_revision(my_car, Vehicle, 1, [metadata: %{editor_id: 1}, storage: Revisionair.Storage.Agent])
       :ok
   """
   def store_revision(structure), do: store_revision(structure, %{}, [])
@@ -46,7 +46,7 @@ defmodule Revisionair do
   Store a revision of the given structure,
   of the 'type' `structure_type`,
   uniquely identified by `unique_identifier`, and possibly with the given `options`
-  in the persistence layer.
+  in the storage layer.
 
   If `structure_type` or `unique_identifier` is an arity-1 function,
   then to find the structure_type or unique_identifier, they are called on the given structure.
@@ -56,12 +56,12 @@ defmodule Revisionair do
   """
   def store_revision(structure, structure_type, unique_identifier), do: store_revision(structure, structure_type, unique_identifier, [])
   def store_revision(structure, structure_type, unique_identifier, options) when is_map(structure) and is_list(options) do
-    persistence_module = persistence_module(options)
+    storage_module = storage_module(options)
     structure_type = extract_structure_type(structure, structure_type)
     unique_identifier = extract_unique_identifier(structure, unique_identifier)
     metadata = Keyword.get(options, :metadata, %{})
 
-    persistence_module.store_revision(structure, structure_type, unique_identifier, metadata)
+    storage_module.store_revision(structure, structure_type, unique_identifier, metadata)
   end
 
   @doc """
@@ -71,10 +71,10 @@ defmodule Revisionair do
 
       iex> Revisionair.Storage.Agent.start_link
       iex> my_car = %{wheels: 4, color: "black"}
-      iex> Revisionair.store_revision(my_car, Vehicle, 1, [metadata: %{editor_id: 1}, persistence: Revisionair.Storage.Agent])
+      iex> Revisionair.store_revision(my_car, Vehicle, 1, [metadata: %{editor_id: 1}, storage: Revisionair.Storage.Agent])
       iex> my_car = %{my_car | color: "green"}
-      iex> Revisionair.store_revision(my_car, Vehicle, 1, [metadata: %{editor_id: 1}, persistence: Revisionair.Storage.Agent])
-      iex> Revisionair.list_revisions(Vehicle, 1, [persistence: Revisionair.Storage.Agent])
+      iex> Revisionair.store_revision(my_car, Vehicle, 1, [metadata: %{editor_id: 1}, storage: Revisionair.Storage.Agent])
+      iex> Revisionair.list_revisions(Vehicle, 1, [storage: Revisionair.Storage.Agent])
       [{%{color: "green", wheels: 4}, %{editor_id: 1, revision: 1}},
       {%{color: "black", wheels: 4}, %{editor_id: 1, revision: 0}}]
   """
@@ -88,8 +88,8 @@ defmodule Revisionair do
   """
   def list_revisions(structure_type, unique_identifier), do: list_revisions(structure_type, unique_identifier, [])
   def list_revisions(structure_type, unique_identifier, options) when is_list(options) do
-    persistence_module = persistence_module(options)
-    persistence_module.list_revisions(structure_type, unique_identifier)
+    storage_module = storage_module(options)
+    storage_module.list_revisions(structure_type, unique_identifier)
   end
 
   @doc """
@@ -120,8 +120,8 @@ defmodule Revisionair do
   """
   def newest_revision(structure_type, unique_identifier), do: newest_revision(structure_type, unique_identifier, [])
   def newest_revision(structure_type, unique_identifier, options) when is_list(options) do
-    persistence_module = persistence_module(options)
-    persistence_module.newest_revision(structure_type, unique_identifier)
+    storage_module = storage_module(options)
+    storage_module.newest_revision(structure_type, unique_identifier)
   end
 
   @doc """
@@ -154,8 +154,8 @@ defmodule Revisionair do
   """
   def get_revision(structure_type, unique_identifier, revision), do: get_revision(structure_type, unique_identifier, revision, [])
   def get_revision(structure_type, unique_identifier, revision, options) when is_list(options) do
-    persistence_module = persistence_module(options)
-    persistence_module.get_revision(structure_type, unique_identifier, revision)
+    storage_module = storage_module(options)
+    storage_module.get_revision(structure_type, unique_identifier, revision)
   end
 
   def get_revision(structure, structure_type, unique_identifier, revision) do
@@ -178,8 +178,8 @@ defmodule Revisionair do
 
   def delete_all_revisions_of(structure_type, unique_identifier), do: delete_all_revisions_of(structure_type, unique_identifier, [])
   def delete_all_revisions_of(structure_type, unique_identifier, options) when is_list(options) do
-    persistence_module = persistence_module(options)
-    persistence_module.delete_all_revisions_of(structure_type, unique_identifier)
+    storage_module = storage_module(options)
+    storage_module.delete_all_revisions_of(structure_type, unique_identifier)
   end
 
   def delete_all_revisions_of(structure, structure_type, unique_identifier) do
@@ -193,8 +193,8 @@ defmodule Revisionair do
   end
 
   # Either read from the options, or otherwise from the application configuration.
-  defp persistence_module(options) do
-    options[:persistence] || Application.fetch_env!(:revisionair, :persistence)
+  defp storage_module(options) do
+    options[:storage] || Application.fetch_env!(:revisionair, :storage)
   end
 
   defp extract_structure_type(structure, structure_type) when is_function(structure_type, 1) do
