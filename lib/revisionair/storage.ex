@@ -19,6 +19,16 @@ defmodule Revisionair.Storage do
 
   At least, the `:revision` key _must_ be set, as this can be used later to uniquely identify a single revision
   of a certain data structure, which is used in `get_revision/3`.
+
+
+  ## Options
+
+  It is possible to receive additional options; this will be the list of fields passed in from the `storage_options:` field
+  of the Revisionair functions.
+
+  If you require default values for these options, add a configuration for your specific adapter implementation.
+  This means that the configuration of different storage adapters will not interfere with one another.
+
   """
 
   @type metadata :: %{revision: any}

@@ -60,7 +60,6 @@ defmodule Revisionair.Storage.Agent do
     end)
   end
 
-
   def delete_all_revisions_of(structure_type, unique_identifier, _opts) do
     Agent.update(__MODULE__, fn structure_types ->
       pop_in structure_types, [structure_type, unique_identifier]

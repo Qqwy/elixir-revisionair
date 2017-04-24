@@ -212,5 +212,5 @@ defmodule Revisionair do
   end
   defp extract_unique_identifier(_structure, unique_identifier), do: unique_identifier
 
-  defp extract_storage_options(options), do: options[:storage_options] || Application.get_env(:revisionair, :storage_options, [])
+  defp extract_storage_options(options), do: options[:storage_options] || []
 end
