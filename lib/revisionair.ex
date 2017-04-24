@@ -12,7 +12,8 @@ defmodule Revisionair do
 
   ## Accepted options
 
-  For now, only `:storage` is an accepted option. It allows overriding the `config :revisionair, storage` setting per function call.
+  - `:storage`: Allows overriding the `config :revisionair, storage` setting per function call. This should be set to the module implementing the Revisionair.Storage behaviour that you want to use.
+  - `:storage_options`: The list passed to this will be passed through to the used storage adapter. This can be used to have per-function-call different settings for the storage adapter.
 
   ## Metadata
 

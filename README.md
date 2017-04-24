@@ -92,6 +92,7 @@ be found at [https://hexdocs.pm/revisionair](https://hexdocs.pm/revisionair).
 
 ## Changelog
 
+- 0.12 Possibility of passing extra options to the storage layer, under the `storage_options:` key.
 - 0.11 Rename `persistence:` option to `storage:`, as this follows the naming of `Revisionair.Storage`.
 - 0.10 Adds `Revisionair.get_revision`, and all revisions are now required to store a `:revision` field, that allows you to track which exact revision some other part of your app is talking about.
 - 0.9.2 Some small bugfixes and improved documentation.
