@@ -26,18 +26,19 @@ defmodule Revisionair.Storage do
   @type structure :: %{}
   @type structure_type :: integer | bitstring | atom
   @type unique_identifier :: integer | bitstring | atom
+  @type options :: list
 
   @doc """
   Stores a new revision for the given map, uniquely identified by the {structure_type, unique_identifier} combination.
   """
-  @callback store_revision(structure, structure_type, unique_identifier, metadata) :: :ok | :error
+  @callback store_revision(structure, structure_type, unique_identifier, metadata, options) :: :ok | :error
 
   @doc """
   Returns a {structure, metadata}-list of all revisions of the given struture, newest-to-oldest.
 
   The metadata field is required to be a map, which has to include a `:revision` field.
   """
-  @callback list_revisions(structure_type, unique_identifier) :: [{structure, metadata}]
+  @callback list_revisions(structure_type, unique_identifier, options) :: [{structure, metadata}]
 
   @doc """
   Returns the newest revision for the given {structure_type, unique_identifier} combination.
@@ -45,14 +46,12 @@ defmodule Revisionair.Storage do
   This callback is supplied decoupled from `list_revisions` for efficiency,
   because it is very common to check only the newest revision.
   """
-  @callback newest_revision(structure_type, unique_identifier) :: {:ok, {structure, metadata}} | :error
+  @callback newest_revision(structure_type, unique_identifier, options) :: {:ok, {structure, metadata}} | :error
 
-  @callback get_revision(structure_type, unique_identifier, revision) :: {:ok, {structure, metadata}} | :error
+  @callback get_revision(structure_type, unique_identifier, revision, options) :: {:ok, {structure, metadata}} | :error
 
   @doc """
   Deletes all revisions for the given {structure_type, unique_identifier}
   """
-  @callback delete_all_revisions_of(structure_type, unique_identifier) :: :ok | :error
-
-  @optional_callbacks newest_revision: 2
+  @callback delete_all_revisions_of(structure_type, unique_identifier, options) :: :ok | :error
 end

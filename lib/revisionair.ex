@@ -57,11 +57,12 @@ defmodule Revisionair do
   def store_revision(structure, structure_type, unique_identifier), do: store_revision(structure, structure_type, unique_identifier, [])
   def store_revision(structure, structure_type, unique_identifier, options) when is_map(structure) and is_list(options) do
     storage_module = storage_module(options)
+    storage_options = extract_storage_options(options)
     structure_type = extract_structure_type(structure, structure_type)
     unique_identifier = extract_unique_identifier(structure, unique_identifier)
     metadata = Keyword.get(options, :metadata, %{})
 
-    storage_module.store_revision(structure, structure_type, unique_identifier, metadata)
+    storage_module.store_revision(structure, structure_type, unique_identifier, metadata, storage_options)
   end
 
   @doc """
@@ -89,7 +90,8 @@ defmodule Revisionair do
   def list_revisions(structure_type, unique_identifier), do: list_revisions(structure_type, unique_identifier, [])
   def list_revisions(structure_type, unique_identifier, options) when is_list(options) do
     storage_module = storage_module(options)
-    storage_module.list_revisions(structure_type, unique_identifier)
+    storage_options = extract_storage_options(options)
+    storage_module.list_revisions(structure_type, unique_identifier, storage_options)
   end
 
   @doc """
@@ -121,7 +123,8 @@ defmodule Revisionair do
   def newest_revision(structure_type, unique_identifier), do: newest_revision(structure_type, unique_identifier, [])
   def newest_revision(structure_type, unique_identifier, options) when is_list(options) do
     storage_module = storage_module(options)
-    storage_module.newest_revision(structure_type, unique_identifier)
+    storage_options = extract_storage_options(options)
+    storage_module.newest_revision(structure_type, unique_identifier, storage_options)
   end
 
   @doc """
@@ -155,7 +158,8 @@ defmodule Revisionair do
   def get_revision(structure_type, unique_identifier, revision), do: get_revision(structure_type, unique_identifier, revision, [])
   def get_revision(structure_type, unique_identifier, revision, options) when is_list(options) do
     storage_module = storage_module(options)
-    storage_module.get_revision(structure_type, unique_identifier, revision)
+    storage_options = extract_storage_options(options)
+    storage_module.get_revision(structure_type, unique_identifier, revision, storage_options)
   end
 
   def get_revision(structure, structure_type, unique_identifier, revision) do
@@ -179,7 +183,8 @@ defmodule Revisionair do
   def delete_all_revisions_of(structure_type, unique_identifier), do: delete_all_revisions_of(structure_type, unique_identifier, [])
   def delete_all_revisions_of(structure_type, unique_identifier, options) when is_list(options) do
     storage_module = storage_module(options)
-    storage_module.delete_all_revisions_of(structure_type, unique_identifier)
+    storage_options = extract_storage_options(options)
+    storage_module.delete_all_revisions_of(structure_type, unique_identifier, storage_options)
   end
 
   def delete_all_revisions_of(structure, structure_type, unique_identifier) do
@@ -206,4 +211,6 @@ defmodule Revisionair do
     unique_identifier.(structure)
   end
   defp extract_unique_identifier(_structure, unique_identifier), do: unique_identifier
+
+  defp extract_storage_options(options), do: options[:storage_options] || Application.get_env(:revisionair, :storage_options, [])
 end

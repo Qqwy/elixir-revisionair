@@ -13,7 +13,7 @@ defmodule Revisionair.Storage.Agent do
     Agent.start_link(fn -> %{} end, name: __MODULE__)
   end
 
-  def store_revision(structure, structure_type, unique_identifier, metadata) do
+  def store_revision(structure, structure_type, unique_identifier, metadata, _opts) do
     Agent.update(__MODULE__, fn structure_types ->
       structure_types = Map.put_new(structure_types, structure_type, %{})
       structure_types = put_in structure_types[structure_type], Map.put_new(structure_types[structure_type], unique_identifier, %{num_revisions: 0, revisions: %{}})
@@ -25,7 +25,7 @@ defmodule Revisionair.Storage.Agent do
     end)
   end
 
-  def list_revisions(structure_type, unique_identifier) do
+  def list_revisions(structure_type, unique_identifier, _opts) do
     Agent.get(__MODULE__, fn
       %{^structure_type => %{^unique_identifier => %{revisions: revisions}}} ->
         revisions
@@ -35,7 +35,7 @@ defmodule Revisionair.Storage.Agent do
     end)
   end
 
-  def newest_revision(structure_type, unique_identifier) do
+  def newest_revision(structure_type, unique_identifier, _opts) do
     Agent.get(__MODULE__, fn
       %{^structure_type => %{^unique_identifier => %{num_revisions: num_revisions, revisions: revisions}}} ->
         case num_revisions do
@@ -51,7 +51,7 @@ defmodule Revisionair.Storage.Agent do
     end)
   end
 
-  def get_revision(structure_type, unique_identifier, revision) do
+  def get_revision(structure_type, unique_identifier, revision, _opts) do
     IO.inspect({structure_type, unique_identifier, revision})
     Agent.get(__MODULE__, fn
       %{^structure_type => %{^unique_identifier => %{revisions: %{^revision => data}}}} ->
@@ -61,7 +61,7 @@ defmodule Revisionair.Storage.Agent do
   end
 
 
-  def delete_all_revisions_of(structure_type, unique_identifier) do
+  def delete_all_revisions_of(structure_type, unique_identifier, _opts) do
     Agent.update(__MODULE__, fn structure_types ->
       pop_in structure_types, [structure_type, unique_identifier]
     end)
