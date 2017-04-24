@@ -106,8 +106,6 @@ defmodule Revisionair do
     list_revisions(structure_type, unique_identifier, options)
   end
 
-
-
   @doc """
   Returns the newest stored revision for the given structure,
   assuming that the structure type can be found under the structures `__struct__` key and it is uniquely identified by the `id` key.
@@ -138,6 +136,34 @@ defmodule Revisionair do
     unique_identifier = extract_unique_identifier(structure, unique_identifier)
 
     newest_revision(structure_type, unique_identifier, options)
+  end
+
+  @doc """
+  Returns the stored revision for the given structure, with the given `revision`.
+  assuming that the structure type can be found under the structures `__struct__` key and it is uniquely identified by the `id` key.
+  """
+  def get_revision(structure, revision), do: get_revision(structure, revision, [])
+  def get_revision(structure, revision, options) when is_list(options) do
+    get_revision(structure, revision, &(&1.__struct__), &(&1.id), options)
+  end
+
+  @doc """
+  Returns the newest stored revision of the structure of given type and identifier.
+  """
+  def get_revision(structure_type, unique_identifier, revision), do: get_revision(structure_type, unique_identifier, revision, [])
+  def get_revision(structure_type, unique_identifier, revision, options) when is_list(options) do
+    persistence_module = persistence_module(options)
+    persistence_module.get_revision(structure_type, unique_identifier, revision)
+  end
+
+  def get_revision(structure, structure_type, unique_identifier, revision) do
+    get_revision(structure, structure_type, unique_identifier, revision, [])
+  end
+  def get_revision(structure, structure_type, unique_identifier, revision, options) when is_function(structure_type) or is_function(unique_identifier) do
+    structure_type = extract_structure_type(structure, structure_type)
+    unique_identifier = extract_unique_identifier(structure, unique_identifier)
+
+    get_revision(structure_type, unique_identifier, revision, options)
   end
 
   @doc """

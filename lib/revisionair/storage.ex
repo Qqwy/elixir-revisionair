@@ -12,9 +12,17 @@ defmodule Revisionair.Storage do
 
   Note that, while written out in this behaviour, some Storage implementations might put
   restrictions on the kind of values `structure_type` and/or `unique_identifier` might have.
+
+  ## Metadata
+
+  A persistence layer is allowed to add more keys to the metadata map that was sent in.
+
+  At least, the `:revision` key _must_ be set, as this can be used later to uniquely identify a single revision
+  of a certain data structure, which is used in `get_revision/3`.
   """
 
-  @type metadata :: %{}
+  @type metadata :: %{revision: any}
+  @type revision :: any
   @type structure :: %{}
   @type structure_type :: integer | bitstring | atom
   @type unique_identifier :: integer | bitstring | atom
@@ -26,6 +34,8 @@ defmodule Revisionair.Storage do
 
   @doc """
   Returns a {structure, metadata}-list of all revisions of the given struture, newest-to-oldest.
+
+  The metadata field is required to be a map, which has to include a `:revision` field.
   """
   @callback list_revisions(structure_type, unique_identifier) :: [{structure, metadata}]
 
@@ -36,6 +46,8 @@ defmodule Revisionair.Storage do
   because it is very common to check only the newest revision.
   """
   @callback newest_revision(structure_type, unique_identifier) :: {:ok, {structure, metadata}} | :error
+
+  @callback get_revision(structure_type, unique_identifier, revision) :: {:ok, {structure, metadata}} | :error
 
   @doc """
   Deletes all revisions for the given {structure_type, unique_identifier}
