@@ -45,25 +45,25 @@ defmodule Revisionair do
 
   @doc """
   Store a revision of the given structure,
-  of the 'type' `structure_type`,
-  uniquely identified by `unique_identifier`, and possibly with the given `options`
+  of the 'type' `item_type`,
+  uniquely identified by `item_id`, and possibly with the given `options`
   in the storage layer.
 
-  If `structure_type` or `unique_identifier` is an arity-1 function,
-  then to find the structure_type or unique_identifier, they are called on the given structure.
+  If `item_type` or `item_id` is an arity-1 function,
+  then to find the item_type or item_id, they are called on the given structure.
   As an example, the default function that extracts the unique identifier from the `:id` field of the structure, is `&(&1.id)`.
 
   `options` might contain the `metadata:` field, in which case the given metadata is saved alongside the stored structure.
   """
-  def store_revision(structure, structure_type, unique_identifier), do: store_revision(structure, structure_type, unique_identifier, [])
-  def store_revision(structure, structure_type, unique_identifier, options) when is_map(structure) and is_list(options) do
+  def store_revision(structure, item_type, item_id), do: store_revision(structure, item_type, item_id, [])
+  def store_revision(structure, item_type, item_id, options) when is_map(structure) and is_list(options) do
     storage_module = storage_module(options)
     storage_options = extract_storage_options(options)
-    structure_type = extract_structure_type(structure, structure_type)
-    unique_identifier = extract_unique_identifier(structure, unique_identifier)
+    item_type = extract_item_type(structure, item_type)
+    item_id = extract_item_id(structure, item_id)
     metadata = Keyword.get(options, :metadata, %{})
 
-    storage_module.store_revision(structure, structure_type, unique_identifier, metadata, storage_options)
+    storage_module.store_revision(structure, item_type, item_id, metadata, storage_options)
   end
 
   @doc """
@@ -88,25 +88,25 @@ defmodule Revisionair do
   @doc """
   Returns a list with all revisions of the structure of given type and identifier.
   """
-  def list_revisions(structure_type, unique_identifier), do: list_revisions(structure_type, unique_identifier, [])
-  def list_revisions(structure_type, unique_identifier, options) when is_list(options) do
+  def list_revisions(item_type, item_id), do: list_revisions(item_type, item_id, [])
+  def list_revisions(item_type, item_id, options) when is_list(options) do
     storage_module = storage_module(options)
     storage_options = extract_storage_options(options)
-    storage_module.list_revisions(structure_type, unique_identifier, storage_options)
+    storage_module.list_revisions(item_type, item_id, storage_options)
   end
 
   @doc """
-  A four-arity version that allows you to specify functions to call on the given structure to extract the structure_type and unique_identifier.
+  A four-arity version that allows you to specify functions to call on the given structure to extract the item_type and item_id.
   Used internally; part of the public API as it might be useful in pipelines.
   """
-  def list_revisions(structure, structure_type, unique_identifier) do
-    list_revisions(structure, structure_type, unique_identifier, [])
+  def list_revisions(structure, item_type, item_id) do
+    list_revisions(structure, item_type, item_id, [])
   end
-  def list_revisions(structure, structure_type, unique_identifier, options) when is_function(structure_type) or is_function(unique_identifier) do
-    structure_type = extract_structure_type(structure, structure_type)
-    unique_identifier = extract_unique_identifier(structure, unique_identifier)
+  def list_revisions(structure, item_type, item_id, options) when is_function(item_type) or is_function(item_id) do
+    item_type = extract_item_type(structure, item_type)
+    item_id = extract_item_id(structure, item_id)
 
-    list_revisions(structure_type, unique_identifier, options)
+    list_revisions(item_type, item_id, options)
   end
 
   @doc """
@@ -121,25 +121,25 @@ defmodule Revisionair do
   @doc """
   Returns the newest stored revision of the structure of given type and identifier.
   """
-  def newest_revision(structure_type, unique_identifier), do: newest_revision(structure_type, unique_identifier, [])
-  def newest_revision(structure_type, unique_identifier, options) when is_list(options) do
+  def newest_revision(item_type, item_id), do: newest_revision(item_type, item_id, [])
+  def newest_revision(item_type, item_id, options) when is_list(options) do
     storage_module = storage_module(options)
     storage_options = extract_storage_options(options)
-    storage_module.newest_revision(structure_type, unique_identifier, storage_options)
+    storage_module.newest_revision(item_type, item_id, storage_options)
   end
 
   @doc """
-  A four-arity version that allows you to specify functions to call on the given structure to extract the structure_type and unique_identifier.
+  A four-arity version that allows you to specify functions to call on the given structure to extract the item_type and item_id.
   Used internally; part of the public API as it might be useful in pipelines.
   """
-  def newest_revision(structure, structure_type, unique_identifier) do
-    newest_revision(structure, structure_type, unique_identifier, [])
+  def newest_revision(structure, item_type, item_id) do
+    newest_revision(structure, item_type, item_id, [])
   end
-  def newest_revision(structure, structure_type, unique_identifier, options) when is_function(structure_type) or is_function(unique_identifier) do
-    structure_type = extract_structure_type(structure, structure_type)
-    unique_identifier = extract_unique_identifier(structure, unique_identifier)
+  def newest_revision(structure, item_type, item_id, options) when is_function(item_type) or is_function(item_id) do
+    item_type = extract_item_type(structure, item_type)
+    item_id = extract_item_id(structure, item_id)
 
-    newest_revision(structure_type, unique_identifier, options)
+    newest_revision(item_type, item_id, options)
   end
 
   @doc """
@@ -156,21 +156,21 @@ defmodule Revisionair do
   @doc """
   Returns the newest stored revision of the structure of given type and identifier.
   """
-  def get_revision(structure_type, unique_identifier, revision), do: get_revision(structure_type, unique_identifier, revision, [])
-  def get_revision(structure_type, unique_identifier, revision, options) when is_list(options) do
+  def get_revision(item_type, item_id, revision), do: get_revision(item_type, item_id, revision, [])
+  def get_revision(item_type, item_id, revision, options) when is_list(options) do
     storage_module = storage_module(options)
     storage_options = extract_storage_options(options)
-    storage_module.get_revision(structure_type, unique_identifier, revision, storage_options)
+    storage_module.get_revision(item_type, item_id, revision, storage_options)
   end
 
-  def get_revision(structure, structure_type, unique_identifier, revision) do
-    get_revision(structure, structure_type, unique_identifier, revision, [])
+  def get_revision(structure, item_type, item_id, revision) do
+    get_revision(structure, item_type, item_id, revision, [])
   end
-  def get_revision(structure, structure_type, unique_identifier, revision, options) when is_list(options) do
-    structure_type = extract_structure_type(structure, structure_type)
-    unique_identifier = extract_unique_identifier(structure, unique_identifier)
+  def get_revision(structure, item_type, item_id, revision, options) when is_list(options) do
+    item_type = extract_item_type(structure, item_type)
+    item_id = extract_item_id(structure, item_id)
 
-    get_revision(structure_type, unique_identifier, revision, options)
+    get_revision(item_type, item_id, revision, options)
   end
 
   @doc """
@@ -181,21 +181,21 @@ defmodule Revisionair do
     delete_all_revisions_of(structure, &(&1.__struct__), &(&1.id), options)
   end
 
-  def delete_all_revisions_of(structure_type, unique_identifier), do: delete_all_revisions_of(structure_type, unique_identifier, [])
-  def delete_all_revisions_of(structure_type, unique_identifier, options) when is_list(options) do
+  def delete_all_revisions_of(item_type, item_id), do: delete_all_revisions_of(item_type, item_id, [])
+  def delete_all_revisions_of(item_type, item_id, options) when is_list(options) do
     storage_module = storage_module(options)
     storage_options = extract_storage_options(options)
-    storage_module.delete_all_revisions_of(structure_type, unique_identifier, storage_options)
+    storage_module.delete_all_revisions_of(item_type, item_id, storage_options)
   end
 
-  def delete_all_revisions_of(structure, structure_type, unique_identifier) do
-    delete_all_revisions_of(structure, structure_type, unique_identifier, [])
+  def delete_all_revisions_of(structure, item_type, item_id) do
+    delete_all_revisions_of(structure, item_type, item_id, [])
   end
-  def delete_all_revisions_of(structure, structure_type, unique_identifier, options) when is_list(options) do
-    structure_type = extract_structure_type(structure, structure_type)
-    unique_identifier = extract_unique_identifier(structure, unique_identifier)
+  def delete_all_revisions_of(structure, item_type, item_id, options) when is_list(options) do
+    item_type = extract_item_type(structure, item_type)
+    item_id = extract_item_id(structure, item_id)
 
-    delete_all_revisions_of(structure_type, unique_identifier, options)
+    delete_all_revisions_of(item_type, item_id, options)
   end
 
   # Either read from the options, or otherwise from the application configuration.
@@ -203,15 +203,15 @@ defmodule Revisionair do
     options[:storage] || Application.fetch_env!(:revisionair, :storage)
   end
 
-  defp extract_structure_type(structure, structure_type) when is_function(structure_type, 1) do
-    structure_type.(structure)
+  defp extract_item_type(structure, item_type) when is_function(item_type, 1) do
+    item_type.(structure)
   end
-  defp extract_structure_type(_structure, structure_type), do: structure_type
+  defp extract_item_type(_structure, item_type), do: item_type
 
-  defp extract_unique_identifier(structure, unique_identifier) when is_function(unique_identifier, 1) do
-    unique_identifier.(structure)
+  defp extract_item_id(structure, item_id) when is_function(item_id, 1) do
+    item_id.(structure)
   end
-  defp extract_unique_identifier(_structure, unique_identifier), do: unique_identifier
+  defp extract_item_id(_structure, item_id), do: item_id
 
   defp extract_storage_options(options), do: options[:storage_options] || []
 end

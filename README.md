@@ -34,7 +34,7 @@ The lower-arity versions of Revisionair expect that you use structs that contain
 is used to differentiate between different kinds of data (i.e. data types) that are stored, while the `:id` field is used
 to differentiate between different entities of this data type.
 
-However, this is fully configurable. Revisionair's functions can be called with custom `structure_type`s and `unique_identifier` fields,
+However, this is fully configurable. Revisionair's functions can be called with custom `item_type`s and `item_id` fields,
 and when you pass (arity-1) functions as these arguments, they are called on the passed structure. So this also works:
 
 ```elixir
@@ -92,6 +92,7 @@ be found at [https://hexdocs.pm/revisionair](https://hexdocs.pm/revisionair).
 
 ## Changelog
 
+- 0.13 Renaming `structure_type` and `unique_identifier` parameter names to `item_type` and `item_id` respectively, for brevity/readability.
 - 0.12 Possibility of passing extra options to the storage layer, under the `storage_options:` key.
 - 0.11 Rename `persistence:` option to `storage:`, as this follows the naming of `Revisionair.Storage`.
 - 0.10 Adds `Revisionair.get_revision`, and all revisions are now required to store a `:revision` field, that allows you to track which exact revision some other part of your app is talking about.

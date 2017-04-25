@@ -11,7 +11,7 @@ defmodule Revisionair.Storage do
   by the kind of persistence layer you want to use.
 
   Note that, while written out in this behaviour, some Storage implementations might put
-  restrictions on the kind of values `structure_type` and/or `unique_identifier` might have.
+  restrictions on the kind of values `item_type` and/or `item_id` might have.
 
   ## Metadata
 
@@ -34,34 +34,34 @@ defmodule Revisionair.Storage do
   @type metadata :: %{revision: any}
   @type revision :: any
   @type structure :: %{}
-  @type structure_type :: integer | bitstring | atom
-  @type unique_identifier :: integer | bitstring | atom
+  @type item_type :: integer | bitstring | atom
+  @type item_id :: integer | bitstring | atom
   @type options :: list
 
   @doc """
-  Stores a new revision for the given map, uniquely identified by the {structure_type, unique_identifier} combination.
+  Stores a new revision for the given map, uniquely identified by the {item_type, item_id} combination.
   """
-  @callback store_revision(structure, structure_type, unique_identifier, metadata, options) :: :ok | :error
+  @callback store_revision(structure, item_type, item_id, metadata, options) :: :ok | :error
 
   @doc """
   Returns a {structure, metadata}-list of all revisions of the given struture, newest-to-oldest.
 
   The metadata field is required to be a map, which has to include a `:revision` field.
   """
-  @callback list_revisions(structure_type, unique_identifier, options) :: [{structure, metadata}]
+  @callback list_revisions(item_type, item_id, options) :: [{structure, metadata}]
 
   @doc """
-  Returns the newest revision for the given {structure_type, unique_identifier} combination.
+  Returns the newest revision for the given {item_type, item_id} combination.
 
   This callback is supplied decoupled from `list_revisions` for efficiency,
   because it is very common to check only the newest revision.
   """
-  @callback newest_revision(structure_type, unique_identifier, options) :: {:ok, {structure, metadata}} | :error
+  @callback newest_revision(item_type, item_id, options) :: {:ok, {structure, metadata}} | :error
 
-  @callback get_revision(structure_type, unique_identifier, revision, options) :: {:ok, {structure, metadata}} | :error
+  @callback get_revision(item_type, item_id, revision, options) :: {:ok, {structure, metadata}} | :error
 
   @doc """
-  Deletes all revisions for the given {structure_type, unique_identifier}
+  Deletes all revisions for the given {item_type, item_id}
   """
-  @callback delete_all_revisions_of(structure_type, unique_identifier, options) :: :ok | :error
+  @callback delete_all_revisions_of(item_type, item_id, options) :: :ok | :error
 end
