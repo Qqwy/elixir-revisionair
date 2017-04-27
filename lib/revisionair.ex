@@ -37,8 +37,7 @@ defmodule Revisionair do
       iex> Revisionair.store_revision(my_car, Vehicle, 1, [metadata: %{editor_id: 1}, storage: Revisionair.Storage.Agent])
       :ok
   """
-  def store_revision(structure), do: store_revision(structure, %{}, [])
-  # def store_revision(structure, metadata) when is_map(metadata), do: store_revision(structure, metadata, [])
+  def store_revision(structure), do: store_revision(structure, [])
   def store_revision(structure, options) when is_list(options) do
     store_revision(structure, &(&1.__struct__), &(&1.id), options)
   end
