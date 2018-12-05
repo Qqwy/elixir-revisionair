@@ -62,7 +62,8 @@ defmodule Revisionair.Storage.Agent do
 
   def delete_all_revisions_of(item_type, item_id, _opts) do
     Agent.update(__MODULE__, fn item_types ->
-      pop_in item_types, [item_type, item_id]
+      # returns a tuple with the deleted value and the new map
+      pop_in(item_types, [item_type, item_id]) |> elem(1)
     end)
     :ok
   end
