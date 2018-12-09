@@ -92,7 +92,7 @@ be found at [https://hexdocs.pm/revisionair](https://hexdocs.pm/revisionair).
 
 ## Changelog
 
-- 0.13.2 Fixing return value of `delete_all_revisions`. Thank you, @mindreframer!
+- 0.13.3 Fixing return value of `delete_all_revisions`. Thank you, @mindreframer!
 - 0.13 Renaming `structure_type` and `unique_identifier` parameter names to `item_type` and `item_id` respectively, for brevity/readability.
 - 0.12 Possibility of passing extra options to the storage layer, under the `storage_options:` key.
 - 0.11 Rename `persistence:` option to `storage:`, as this follows the naming of `Revisionair.Storage`.
