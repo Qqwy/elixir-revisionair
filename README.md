@@ -17,7 +17,7 @@ by adding `revisionair` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:revisionair, "~> 0.9.0"}]
+  [{:revisionair, "~> 0.13.0"}]
 end
 ```
 
