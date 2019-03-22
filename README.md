@@ -12,7 +12,7 @@ you can use it with Revisionair, by simply implementing the `Revisionair.Storage
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
+Revisionair is [available in Hex](https://hex.pm/docs/publish). The package can be installed
 by adding `revisionair` to your list of dependencies in `mix.exs`:
 
 ```elixir
@@ -66,7 +66,7 @@ Revisionair.store_revision(my_car, Vehicle, my_car.id, %{editor: current_user}, 
 
 Revisionair ships with a very simple `Agent` layer that is used for testing.
 
-For your practical applications, some other versions might be more appropriate.
+For your practical applications, some other storage layer might be more appropriate. Check for instance [revisionair_ecto](https://hex.pm/packages/revisionair_ecto) for an Ecto-based persistence layer.
 
 Other packages might be made by me or other people, that combine Revisionair with any of the
 databases and other persistence layers out there. They will be listed here.
